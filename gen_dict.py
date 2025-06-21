@@ -150,7 +150,7 @@ class DictGen:
             f"Generate dict finish, we have {len(self.final_dict)} entries in the dict."
         )
 
-    def save_dict(self, file_path="sven.json"):
+    def save_dict(self, file_path="folkets_sv_en_public.json"):
         with open(file_path, "w") as file:
             json.dump(self.final_dict, file, ensure_ascii=False)
 
