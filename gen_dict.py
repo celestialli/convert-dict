@@ -5,6 +5,7 @@ import xmltodict
 
 XML_DICT_URL = "https://folkets-lexikon.csc.kth.se/folkets/folkets_sv_en_public.xml"
 XDXF_DICT_URL = "https://folkets-lexikon.csc.kth.se/folkets/folkets_sv_en_public.xdxf"
+JSON_DICT_FILENAME = "folkets_sv_en_public.json"
 
 
 def download_file(url):
@@ -31,7 +32,7 @@ def download_file(url):
 
 
 def quot_filter(s):
-    return s.replace("&quot;", '"')
+    return s.replace("&quot;", '"').replace("&#39;", "'")
 
 
 def extract_list_or_str(content):
@@ -43,13 +44,16 @@ def extract_list_or_str(content):
         raise RuntimeError("Content is not a list or dict:", content)
 
 
-def extract_list_or_str_with_key(content, key):
+def extract_list_or_str_with_hierachy_key(content, key, short_key):
     if isinstance(content, list):
         result = []
         for x in content:
             if key in x and "@value" in x[key]:
                 result.append(
-                    {"v": quot_filter(x["@value"]), key: quot_filter(x[key]["@value"])}
+                    {
+                        "v": quot_filter(x["@value"]),
+                        short_key: quot_filter(x[key]["@value"]),
+                    }
                 )
             else:
                 result.append({"v": quot_filter(x["@value"])})
@@ -58,7 +62,33 @@ def extract_list_or_str_with_key(content, key):
         if key in content and "@value" in content[key]:
             return {
                 "v": quot_filter(content["@value"]),
-                key: quot_filter(content[key]["@value"]),
+                short_key: quot_filter(content[key]["@value"]),
+            }
+        else:
+            return {"v": quot_filter(content["@value"])}
+    else:
+        raise RuntimeError("Content is not a list or dict:", content)
+
+
+def extract_list_or_str_with_parallel_key_level(content):
+    if isinstance(content, list):
+        result = []
+        for x in content:
+            if "@level" in x:
+                result.append(
+                    {
+                        "v": quot_filter(x["@value"]),
+                        "l": quot_filter(x["@level"]),
+                    }
+                )
+            else:
+                result.append({"v": quot_filter(x["@value"])})
+        return result
+    elif isinstance(content, dict):
+        if "@level" in content:
+            return {
+                "v": quot_filter(content["@value"]),
+                "l": quot_filter(content["@level"]),
             }
         else:
             return {"v": quot_filter(content["@value"])}
@@ -99,6 +129,7 @@ class DictGen:
     def gen(self):
         for w in self.xml_dict["dictionary"]["word"]:
             key = w["@value"]
+            key = quot_filter(key)
             try:
                 self.final_dict[key] = {"t": extract_list_or_str(w["translation"])}
             except (KeyError, RuntimeError):
@@ -118,31 +149,31 @@ class DictGen:
 
             # Example
             if "example" in w:
-                self.final_dict[key]["e"] = extract_list_or_str_with_key(
-                    w["example"], "translation"
+                self.final_dict[key]["e"] = extract_list_or_str_with_hierachy_key(
+                    w["example"], "translation", "t"
                 )
 
             # Idiom
             if "idiom" in w:
-                self.final_dict[key]["id"] = extract_list_or_str_with_key(
-                    w["idiom"], "translation"
+                self.final_dict[key]["id"] = extract_list_or_str_with_hierachy_key(
+                    w["idiom"], "translation", "t"
                 )
 
             # Synonym
             if "synonym" in w:
-                self.final_dict[key]["s"] = extract_list_or_str_with_key(
-                    w["synonym"], "level"
+                self.final_dict[key]["s"] = extract_list_or_str_with_parallel_key_level(
+                    w["synonym"]
                 )
 
             # Definition
-            if "Definition" in w:
-                self.final_dict[key]["d"] = extract_list_or_str(w["Definition"])
+            if "definition" in w:
+                self.final_dict[key]["d"] = extract_list_or_str(w["definition"])
 
             p, a = self.extract_phonetic_and_audioaddr_in_xdxf(key)
             # Phonetic symbol
             if p is not None:
                 self.final_dict[key]["p"] = p
-            # Audio address
+            # Audio url
             if a is not None:
                 self.final_dict[key]["a"] = a
 
@@ -150,9 +181,9 @@ class DictGen:
             f"Generate dict finish, we have {len(self.final_dict)} entries in the dict."
         )
 
-    def save_dict(self, file_path="folkets_sv_en_public.json"):
-        with open(file_path, "w") as file:
-            json.dump(self.final_dict, file, ensure_ascii=False)
+    def save_dict(self, file_path=JSON_DICT_FILENAME):
+        with open(file_path, "w") as f:
+            json.dump(self.final_dict, f, ensure_ascii=False)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-echo "-- Running: isort"
-isort .
-
 echo "-- Running: ruff format"
 ruff format
 
