@@ -1,16 +1,30 @@
 # Convert-dict
 
-This repository stores code for converting dictionaries from [The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/folkets.en.html) and releases the converted dictionaries.
+This repository serves two purposes:
 
-## Details
+1. **Code storage**: Contains code for converting Swedish-English dictionaries from [The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/folkets.en.html).
+2. **Dictionary releases**: Provides the converted dictionaries in an optimized format.
 
-[The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/om.en.html) can be downloaded in 2 formats: XML and XDXF. The XML format contains more information but does not include audio download URLs, while the XDXF format has better phonetic symbols. However, both XML and XDXF formats are difficult for software to parse directly. 
+## Overview
 
-This repository combines audio download URLs and phonetic symbols from the XDXF format with the comprehensive data from the XML dictionary, then converts the merged dictionary into JSON format for easier processing.
+[The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/om.en.html) is available in two formats: XML and XDXF. Each format has distinct advantages:
 
-### Example
+- **XML format**: Contains comprehensive information but lacks audio download URLs
+- **XDXF format**: Includes better phonetic symbols and audio URLs but has less detailed content
 
-We'll use a dictionary entry as an example to explain how to read the converted dictionary:
+However, both formats are challenging for software to parse directly.
+
+## Solution
+
+This repository addresses these limitations by:
+
+1. **Merging data**: Combines audio download URLs and phonetic symbols from XDXF with comprehensive data from XML
+2. **Format conversion**: Converts the merged dictionary to JSON format for easier processing
+3. **Character normalization**: Converts HTML entities (`&quot;` and `&#39;`) to their corresponding characters in the output
+
+## Usage Example
+
+Here's a sample dictionary entry to illustrate the converted format:
 
 ```json
 "jord": {
@@ -48,27 +62,32 @@ We'll use a dictionary entry as an example to explain how to read the converted 
     "d": "mull, mylla; odlat markområde",
     "p": "jo:r_d",
     "a": "http://lexin.nada.kth.se/sound/jord.mp3"
-},
+}
 ```
 
-**Field explanations:**
-- `t`: translation
-- `c`: class (part of speech)
-- `i`: inflection
-- `e`: example
-- `id`: idiom
-- `s`: synonym
-- `d`: definition
-- `p`: phonetic transcription
-- `a`: audio URL
-- `v`: value
-- `l`: level
+### Field Reference
 
-By default, the dictionary is saved as JSON without indentation to minimize file size. You can manually set `indent=4` in the `json.dump()` method to generate a human-friendly JSON output.
+| Field | Description |
+|-------|-------------|
+| `t` | Translation |
+| `c` | Class (part of speech) |
+| `i` | Inflection |
+| `e` | Example |
+| `id` | Idiom |
+| `s` | Synonym |
+| `d` | Definition |
+| `p` | Phonetic transcription |
+| `a` | Audio URL |
+| `v` | Value |
+| `l` | Level |
 
-## Thanks
+### Output Format
 
-Thanks to the excellent work of [The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/folkets.en.html), all dictionaries released by this repository are republished works based on The People's Dictionary.
+By default, the dictionary is saved as compact JSON (without indentation) to minimize file size. To generate human-readable output, set `indent=4` in the `json.dump()` method.
+
+## Acknowledgments
+
+We extend our gratitude to [The People's Dictionary](https://folkets-lexikon.csc.kth.se/folkets/folkets.en.html) for their excellent work. All dictionaries released by this repository are derivative works based on The People's Dictionary.
 
 
 ## License
