@@ -51,15 +51,21 @@ Here's a sample dictionary entry to illustrate the converted format:
             "t": "work the land"
         }
     ],
-    "id": {
-        "v": "falla i god jord (\"tas emot med uppskattning\")",
-        "t": "fall on fertile ground (\"be received with appreciation\")"
-    },
-    "s": {
-        "v": "mull",
-        "l": "3.3"
-    },
-    "d": "mull, mylla; odlat markområde",
+    "id": [
+        {
+            "v": "falla i god jord (\"tas emot med uppskattning\")",
+            "t": "fall on fertile ground (\"be received with appreciation\")"
+        }
+    ],
+    "s": [
+        {
+            "v": "mull",
+            "l": "3.3"
+        }
+    ],
+    "d": [
+        "mull, mylla; odlat markområde"
+    ],
     "p": "jo:r_d",
     "a": "http://lexin.nada.kth.se/sound/jord.mp3"
 }

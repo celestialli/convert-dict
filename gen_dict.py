@@ -39,7 +39,7 @@ def extract_list_or_str(content):
     if isinstance(content, list):
         return [quot_filter(x["@value"]) for x in content]
     elif isinstance(content, dict):
-        return quot_filter(content["@value"])
+        return [quot_filter(content["@value"])]
     else:
         raise RuntimeError("Content is not a list or dict:", content)
 
@@ -60,12 +60,14 @@ def extract_list_or_str_with_hierachy_key(content, key, short_key):
         return result
     elif isinstance(content, dict):
         if key in content and "@value" in content[key]:
-            return {
-                "v": quot_filter(content["@value"]),
-                short_key: quot_filter(content[key]["@value"]),
-            }
+            return [
+                {
+                    "v": quot_filter(content["@value"]),
+                    short_key: quot_filter(content[key]["@value"]),
+                }
+            ]
         else:
-            return {"v": quot_filter(content["@value"])}
+            return [{"v": quot_filter(content["@value"])}]
     else:
         raise RuntimeError("Content is not a list or dict:", content)
 
@@ -86,12 +88,14 @@ def extract_list_or_str_with_parallel_key_level(content):
         return result
     elif isinstance(content, dict):
         if "@level" in content:
-            return {
-                "v": quot_filter(content["@value"]),
-                "l": quot_filter(content["@level"]),
-            }
+            return [
+                {
+                    "v": quot_filter(content["@value"]),
+                    "l": quot_filter(content["@level"]),
+                }
+            ]
         else:
-            return {"v": quot_filter(content["@value"])}
+            return [{"v": quot_filter(content["@value"])}]
     else:
         raise RuntimeError("Content is not a list or dict:", content)
 
